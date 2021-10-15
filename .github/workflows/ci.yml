@@ -11,10 +11,7 @@ jobs:
 
       - name: Install LLVM and Clang
         run: |
-          wget https://apt.llvm.org/llvm.sh
-          chmod +x llvm.sh
-          sudo ./llvm.sh 13
-          sudo apt-get install lld
+          sh ./install-llvm.sh
 
       - name: Build
         run: |
