@@ -10,9 +10,26 @@
     <canvas id="canvas"></canvas>
     <script>
         (async () => {
-            const response = await fetch('image.wasm');
-            const bytes = await response.arrayBuffer();
-            const wasmInstance = (await WebAssembly.instantiate(bytes)).instance;
+            const utf8Decoder = new TextDecoder('utf-8');
+            const memory = new WebAssembly.Memory({ initial: 256 });
+
+            const imports = {
+                js_console_log: (string, length) => {
+                    const bytes = memory.buffer.slice(string, string + length);
+                    console.info(utf8Decoder.decode(bytes));
+                }
+            };
+
+            const importObject = {
+                env: {
+                    __memory_base: 0,
+                    __table_base: 0,
+                    memory,
+                    ...imports
+                }
+            };
+
+            const wasmInstance = (await WebAssembly.instantiateStreaming(fetch('image.wasm'), importObject)).instance;
 
             var context = document.getElementById('canvas').getContext('2d');
             var image = new Image();
@@ -27,7 +44,7 @@
 
                 const wasmBufferOffset = wasmInstance.exports.getBufferOffset();
                 const wasmBufferLength = wasmInstance.exports.getBufferLength();
-                const wasmMemory = new Uint8ClampedArray(wasmInstance.exports.memory.buffer, wasmBufferOffset, wasmBufferLength);
+                const wasmMemory = new Uint8ClampedArray(memory.buffer, wasmBufferOffset, wasmBufferLength);
 
                 for (let i = 0; i < wasmMemory.length; i++) {
                     wasmMemory[i] = imageData.data[i];
