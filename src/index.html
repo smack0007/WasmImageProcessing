@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>WASM Image Processing</title>
+</head>
+
+<body>
+    <h1>WASM Image Processing</h1>
+    <canvas id="canvas"></canvas>
+    <script>
+        (async () => {
+            const response = await fetch('image.wasm');
+            const bytes = await response.arrayBuffer();
+            const wasmInstance = (await WebAssembly.instantiate(bytes)).instance;
+
+            var context = document.getElementById('canvas').getContext('2d');
+            var image = new Image();
+            image.onload = () => {
+                canvas.width = image.width;
+                canvas.height = image.height;
+                context.drawImage(image, 0, 0);
+
+                const imageData = context.getImageData(0, 0, image.width, image.height);
+
+                const wasmBufferOffset = wasmInstance.exports.wasmGetBufferOffset();
+                const wasmBufferLength = wasmInstance.exports.wasmGetBufferLength();
+                const wasmMemory = new Uint8ClampedArray(wasmInstance.exports.memory.buffer, wasmBufferOffset, wasmBufferLength);
+
+                for (let i = 0; i < wasmMemory.length; i++) {
+                    wasmMemory[i] = imageData.data[i];
+                }
+
+                wasmInstance.exports.wasmProcess(imageData.width, imageData.height, imageData.data);
+
+                context.putImageData(new ImageData(wasmMemory, image.width, image.height), 0, 0);
+            };
+            image.src = 'default.png';
+        })();
+    </script>
+</body>
+
+</html>
