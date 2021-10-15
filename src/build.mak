@@ -1,6 +1,6 @@
 SCRIPT_DIRECTORY := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 OUTPUT_DIRECTORY := $(abspath $(SCRIPT_DIRECTORY)../bin)/
-COMPILE_FLAGS := --target=wasm32 --no-standard-libraries -Wl,--export-dynamic -Wl,--no-entry
+COMPILE_FLAGS := --target=wasm32 --no-standard-libraries -Wl,--export-dynamic,--import-memory,--import-undefined,--no-entry
 
 .PHONY: build
 build: \
