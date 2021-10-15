@@ -21,6 +21,7 @@ jobs:
           pushd ./bin
           find . \! -name '.git' -delete
           popd
+          apt-get install lld-13
           make -f build.mak build
       - name: Publish
         run: |
