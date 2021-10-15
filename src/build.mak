@@ -16,7 +16,7 @@ $(OUTPUT_DIRECTORY)image.wasm: image.c wasm.c
 	clang $(COMPILE_FLAGS) -o "$(OUTPUT_DIRECTORY)image.wasm" image.c wasm.c
 
 $(OUTPUT_DIRECTORY)index.html: index.html
-	copy index.html "$(OUTPUT_DIRECTORY)index.html"
+	cp index.html "$(OUTPUT_DIRECTORY)index.html"
 
 $(OUTPUT_DIRECTORY)default.png: default.png
-	copy default.png "$(OUTPUT_DIRECTORY)default.png"
+	cp default.png "$(OUTPUT_DIRECTORY)default.png"
