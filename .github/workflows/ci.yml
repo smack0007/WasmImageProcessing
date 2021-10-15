@@ -17,7 +17,7 @@ jobs:
         run: |
           git clone https://github.com/smack0007/WasmImageProcessing.git -b dist ./bin
           pushd bin
-          find . \! -name '.git' -delete
+          find -not -path "./.git/*" -not -name ".git" -delete
           popd
           make -f build.mak build
 
