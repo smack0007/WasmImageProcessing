@@ -8,7 +8,7 @@
         "isDefault": true
       },
       "type": "shell",
-      "command": "make -f build.mak build",
+      "command": "bash -li -c \"make -f build.mak build\"",
       "options": {
         "cwd": "${workspaceFolder}"
       },
