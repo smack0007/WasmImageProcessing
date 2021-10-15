@@ -23,15 +23,17 @@
 
                 const imageData = context.getImageData(0, 0, image.width, image.height);
 
-                const wasmBufferOffset = wasmInstance.exports.wasmGetBufferOffset();
-                const wasmBufferLength = wasmInstance.exports.wasmGetBufferLength();
+                console.info(wasmInstance.exports);
+
+                const wasmBufferOffset = wasmInstance.exports.getBufferOffset();
+                const wasmBufferLength = wasmInstance.exports.getBufferLength();
                 const wasmMemory = new Uint8ClampedArray(wasmInstance.exports.memory.buffer, wasmBufferOffset, wasmBufferLength);
 
                 for (let i = 0; i < wasmMemory.length; i++) {
                     wasmMemory[i] = imageData.data[i];
                 }
 
-                wasmInstance.exports.wasmProcess(imageData.width, imageData.height, imageData.data);
+                wasmInstance.exports.process(imageData.width, imageData.height, imageData.data);
 
                 context.putImageData(new ImageData(wasmMemory, image.width, image.height), 0, 0);
             };
