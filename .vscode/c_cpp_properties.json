@@ -4,10 +4,10 @@
       "name": "Win32",
       "includePath": ["${workspaceFolder}/**"],
       "defines": ["__clang__", "_DEBUG", "UNICODE", "_UNICODE", "GLCALLSTYLE="],
-      "compilerPath": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64\\cl.exe",
+      "compilerPath": "C:\\Program Files\\LLVM\\bin\\clang.exe",
       "cStandard": "c17",
       "cppStandard": "c++17",
-      "intelliSenseMode": "windows-msvc-x64"
+      "intelliSenseMode": "clang-x64"
     }
   ],
   "version": 4
