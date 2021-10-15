@@ -4,10 +4,14 @@ COMPILE_FLAGS := --target=wasm32 --no-standard-libraries -Wl,--export-all -Wl,--
 
 .PHONY: build
 build: \
+	$(OUTPUT_DIRECTORY) \
 	$(OUTPUT_DIRECTORY)image.wasm \
 	$(OUTPUT_DIRECTORY)index.html \
 	$(OUTPUT_DIRECTORY)default.png
 	
+$(OUTPUT_DIRECTORY):
+	mkdir "$(OUTPUT_DIRECTORY)"
+
 $(OUTPUT_DIRECTORY)image.wasm: image.c wasm.c
 	clang $(COMPILE_FLAGS) -o "$(OUTPUT_DIRECTORY)image.wasm" image.c wasm.c
 
