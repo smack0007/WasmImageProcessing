@@ -1,2 +1,2 @@
-cd bin instead of dist.
+Use bash to build on windows.
 
