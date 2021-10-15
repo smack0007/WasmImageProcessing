@@ -16,7 +16,7 @@ jobs:
       - name: Build
         run: |
           git clone https://github.com/smack0007/WasmImageProcessing.git -b dist ./bin
-          pushd bin
+          pushd ./bin
           find -not -path "./.git/*" -not -name ".git" -delete
           popd
           make -f build.mak build
@@ -24,7 +24,7 @@ jobs:
       - name: Publish
         run: |
           git log -1 --pretty=%B > commit.msg
-          cd bin
+          cd ./bin
           git config --global user.name "smack0007"
           git config --global user.email "zachary.snow@gmail.com"
           git add -A && git commit -F "../commit.msg"
