@@ -14,7 +14,7 @@
             const memory = new WebAssembly.Memory({ initial: 256 });
 
             const imports = {
-                js_console_log: (string, length) => {
+                jsLog: (string, length) => {
                     const bytes = memory.buffer.slice(string, string + length);
                     console.info(utf8Decoder.decode(bytes));
                 }
