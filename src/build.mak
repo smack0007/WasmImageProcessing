@@ -12,8 +12,8 @@ build: \
 $(OUTPUT_DIRECTORY):
 	mkdir "$(OUTPUT_DIRECTORY)"
 
-$(OUTPUT_DIRECTORY)image.wasm: image.c wasm.c
-	clang $(COMPILE_FLAGS) -o "$(OUTPUT_DIRECTORY)image.wasm" image.c wasm.c
+$(OUTPUT_DIRECTORY)image.wasm: image.c runtime.c wasm.c
+	clang $(COMPILE_FLAGS) -o "$(OUTPUT_DIRECTORY)image.wasm" image.c runtime.c wasm.c
 
 $(OUTPUT_DIRECTORY)index.html: index.html
 	cp index.html "$(OUTPUT_DIRECTORY)index.html"
