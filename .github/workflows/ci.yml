@@ -5,14 +5,10 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: emscripten/emsdk:2.0.34
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Install Emscripten
-        run: |
-          sh ./install-emsdk.sh
-          emcc -v
 
       - name: Build
         run: |

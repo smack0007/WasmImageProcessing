@@ -8,7 +8,7 @@
         "isDefault": true
       },
       "type": "shell",
-      "command": "make",
+      "command": "docker run --rm -it -v \"${workspaceFolder}:/app\" -w /app emscripten/emsdk make",
       "options": {
         "cwd": "${workspaceFolder}"
       },
