@@ -6,7 +6,10 @@
 
   <body>
     <h1>WASM Image Processing</h1>
-    <canvas id="canvas"></canvas>
+    <h2 id="loading">Loading...</h2>
+    <canvas id="canvas" style="display: none"></canvas>
+    <p>Drag and drop a photo.</p>
+
     <script src="image.js"></script>
     <script>
       Module.onRuntimeInitialized = async (_) => {
@@ -16,9 +19,13 @@
           process: Module.cwrap("wasmProcess", "void", ["number", "number", "number"]),
         };
 
-        var context = document.getElementById("canvas").getContext("2d");
-        var image = new Image();
-        image.onload = () => {
+        const loading = document.getElementById("loading");
+
+        const canvas = document.getElementById("canvas");
+        const context = canvas.getContext("2d");
+
+        const image = new Image();
+        image.addEventListener("load", () => {
           canvas.width = image.width;
           canvas.height = image.height;
           context.drawImage(image, 0, 0);
@@ -41,9 +48,38 @@
           context.putImageData(newImageData, 0, 0);
 
           api.free(wasmBufferPtr);
-        };
+
+          loading.style.display = "none";
+          canvas.style.display = "block";
+        });
+
+        image.addEventListener("error", () => {
+          console.error("Failed to load image.");
+          loading.style.display = "none";
+          canvas.style.display = "block";
+        });
 
         image.src = "default.png";
+
+        document.addEventListener("dragover", (event) => {
+          event.preventDefault();
+        });
+        document.addEventListener("drop", (event) => {
+          event.preventDefault();
+
+          let file = undefined;
+          if (event.dataTransfer.items && event.dataTransfer.items[0] && event.dataTransfer.items[0].kind === "file") {
+            file = event.dataTransfer.items[0].getAsFile();
+          } else if (event.dataTransfer.files[0]) {
+            file = event.dataTransfer.files[0].name;
+          }
+
+          if (file) {
+            loading.style.display = "block";
+            canvas.style.display = "none";
+            image.src = URL.createObjectURL(file);
+          }
+        });
       };
     </script>
   </body>
