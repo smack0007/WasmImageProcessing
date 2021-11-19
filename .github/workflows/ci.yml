@@ -13,9 +13,9 @@ jobs:
       - name: Build
         run: |
           git clone https://github.com/smack0007/WasmImageProcessing.git -b dist ./bin
-          pushd ./bin
+          cd ./bin
           find -not -path "./.git/*" -not -name ".git" -delete
-          popd
+          cd ..
           make
 
       - name: Publish
