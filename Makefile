@@ -13,10 +13,10 @@ $(BIN_DIRECTORY):
 	mkdir "$(BIN_DIRECTORY)"
 
 $(BIN_DIRECTORY)image.js: $(SRC_DIRECTORY)image.c $(SRC_DIRECTORY)wasm.c
-	emcc --no-entry -s WASM=1 -s EXPORTED_RUNTIME_METHODS='["cwrap"]' -o "$(BIN_DIRECTORY)image.js" $(SRC_DIRECTORY)image.c $(SRC_DIRECTORY)wasm.c
+	emcc --no-entry -s EXPORTED_RUNTIME_METHODS='["cwrap"]' -o "$(BIN_DIRECTORY)image.js" $(SRC_DIRECTORY)image.c $(SRC_DIRECTORY)wasm.c
 
 $(BIN_DIRECTORY)index.html: $(SRC_DIRECTORY)index.html
-	copy "$(SRC_DIRECTORY)index.html" "$(BIN_DIRECTORY)index.html"
+	cp "$(SRC_DIRECTORY)index.html" "$(BIN_DIRECTORY)index.html"
 
 $(BIN_DIRECTORY)default.png: $(SRC_DIRECTORY)default.png
-	copy "$(SRC_DIRECTORY)default.png" "$(BIN_DIRECTORY)default.png"
+	cp "$(SRC_DIRECTORY)default.png" "$(BIN_DIRECTORY)default.png"
