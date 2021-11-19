@@ -1,51 +1,50 @@
 <!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <title>WASM Image Processing</title>
-</head>
+  </head>
 
-<body>
+  <body>
     <h1>WASM Image Processing</h1>
     <canvas id="canvas"></canvas>
     <script src="image.js"></script>
     <script>
-        Module.onRuntimeInitialized = async _ => {
-            const api = {
-                alloc: Module.cwrap('wasmAlloc', 'number', ['number', 'number',]),
-                free: Module.cwrap('wasmFree', 'void', ['number']),
-                process: Module.cwrap('wasmProcess', 'void', ['number', 'number', 'number']),
-            };
-
-            var context = document.getElementById('canvas').getContext('2d');
-            var image = new Image();
-            image.onload = () => {
-                canvas.width = image.width;
-                canvas.height = image.height;
-                context.drawImage(image, 0, 0);
-
-                const imageData = context.getImageData(0, 0, image.width, image.height);
-
-                const wasmBufferPtr = api.alloc(image.width, image.height);
-
-                // Copy the image into WASM memory.
-                Module.HEAPU8.set(imageData.data, wasmBufferPtr);
-
-                api.process(imageData.width, imageData.height, wasmBufferPtr);
-
-                // Draw the image back to the canvas.
-                const newImageData = new ImageData(
-                    new Uint8ClampedArray(Module.HEAPU8.buffer, wasmBufferPtr, image.width * image.height * 4),
-                    image.width,
-                    image.height
-                );
-                context.putImageData(newImageData, 0, 0);
-
-                api.free(wasmBufferPtr);
-            };
-            image.src = 'default.png';
+      Module.onRuntimeInitialized = async (_) => {
+        const api = {
+          alloc: Module.cwrap("wasmAlloc", "number", ["number", "number"]),
+          free: Module.cwrap("wasmFree", "void", ["number"]),
+          process: Module.cwrap("wasmProcess", "void", ["number", "number", "number"]),
         };
-    </script>
-</body>
 
+        var context = document.getElementById("canvas").getContext("2d");
+        var image = new Image();
+        image.onload = () => {
+          canvas.width = image.width;
+          canvas.height = image.height;
+          context.drawImage(image, 0, 0);
+
+          const imageData = context.getImageData(0, 0, image.width, image.height);
+
+          const wasmBufferPtr = api.alloc(image.width, image.height);
+
+          // Copy the image into WASM memory.
+          Module.HEAPU8.set(imageData.data, wasmBufferPtr);
+
+          api.process(imageData.width, imageData.height, wasmBufferPtr);
+
+          // Draw the image back to the canvas.
+          const newImageData = new ImageData(
+            new Uint8ClampedArray(Module.HEAPU8.buffer, wasmBufferPtr, image.width * image.height * 4),
+            image.width,
+            image.height
+          );
+          context.putImageData(newImageData, 0, 0);
+
+          api.free(wasmBufferPtr);
+        };
+
+        image.src = "default.png";
+      };
+    </script>
+  </body>
 </html>
