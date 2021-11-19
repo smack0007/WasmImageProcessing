@@ -3,7 +3,7 @@
 #include "image.h"
 
 EMSCRIPTEN_KEEPALIVE
-byte* wasmAlloc(int width, int height) {
+byte* wasmAlloc(uint32 width, uint32 height) {
   return malloc(width * height * 4);
 }
 
@@ -13,6 +13,6 @@ void wasmFree(byte* p) {
 }
 
 EMSCRIPTEN_KEEPALIVE
-void wasmProcess(unsigned int width, unsigned int height, byte* buffer) {
+void wasmProcess(uint32 width, uint32 height, byte* buffer) {
   process(width, height, buffer);    
 }
