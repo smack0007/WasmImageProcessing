@@ -13,7 +13,7 @@ $(BIN_DIRECTORY):
 	mkdir "$(BIN_DIRECTORY)"
 
 $(BIN_DIRECTORY)image.js: $(SRC_DIRECTORY)image.c $(SRC_DIRECTORY)wasm.c
-	emcc --no-entry -s EXPORTED_RUNTIME_METHODS='["cwrap"]' -o "$(BIN_DIRECTORY)image.js" $(SRC_DIRECTORY)image.c $(SRC_DIRECTORY)wasm.c
+	emcc -O3 --no-entry -s EXPORTED_RUNTIME_METHODS='["cwrap"]' -o "$(BIN_DIRECTORY)image.js" $(SRC_DIRECTORY)image.c $(SRC_DIRECTORY)wasm.c
 
 $(BIN_DIRECTORY)index.html: $(SRC_DIRECTORY)index.html
 	cp "$(SRC_DIRECTORY)index.html" "$(BIN_DIRECTORY)index.html"
