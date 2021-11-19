@@ -8,28 +8,14 @@
 <body>
     <h1>WASM Image Processing</h1>
     <canvas id="canvas"></canvas>
+    <script src="image.js"></script>
     <script>
-        (async () => {
-            const utf8Decoder = new TextDecoder('utf-8');
-            const memory = new WebAssembly.Memory({ initial: 256 });
-
-            const imports = {
-                jsLog: (string, length) => {
-                    const bytes = memory.buffer.slice(string, string + length);
-                    console.info(utf8Decoder.decode(bytes));
-                }
+        Module.onRuntimeInitialized = async _ => {
+            const api = {
+                alloc: Module.cwrap('wasmAlloc', 'number', ['number', 'number',]),
+                free: Module.cwrap('wasmFree', 'void', ['number']),
+                process: Module.cwrap('wasmProcess', 'void', ['number', 'number', 'number']),
             };
-
-            const importObject = {
-                env: {
-                    __memory_base: 0,
-                    __table_base: 0,
-                    memory,
-                    ...imports
-                }
-            };
-
-            const wasmInstance = (await WebAssembly.instantiateStreaming(fetch('image.wasm'), importObject)).instance;
 
             var context = document.getElementById('canvas').getContext('2d');
             var image = new Image();
@@ -40,22 +26,25 @@
 
                 const imageData = context.getImageData(0, 0, image.width, image.height);
 
-                console.info(wasmInstance.exports);
+                const wasmBufferPtr = api.alloc(image.width, image.height);
 
-                const wasmBufferOffset = wasmInstance.exports.getBufferOffset();
-                const wasmBufferLength = wasmInstance.exports.getBufferLength();
-                const wasmMemory = new Uint8ClampedArray(memory.buffer, wasmBufferOffset, wasmBufferLength);
+                // Copy the image into WASM memory.
+                Module.HEAPU8.set(imageData.data, wasmBufferPtr);
 
-                for (let i = 0; i < wasmMemory.length; i++) {
-                    wasmMemory[i] = imageData.data[i];
-                }
+                api.process(imageData.width, imageData.height, wasmBufferPtr);
 
-                wasmInstance.exports.process(imageData.width, imageData.height, imageData.data);
+                // Draw the image back to the canvas.
+                const newImageData = new ImageData(
+                    new Uint8ClampedArray(Module.HEAPU8.buffer, wasmBufferPtr, image.width * image.height * 4),
+                    image.width,
+                    image.height
+                );
+                context.putImageData(newImageData, 0, 0);
 
-                context.putImageData(new ImageData(wasmMemory, image.width, image.height), 0, 0);
+                api.free(wasmBufferPtr);
             };
             image.src = 'default.png';
-        })();
+        };
     </script>
 </body>
 

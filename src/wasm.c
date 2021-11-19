@@ -1,29 +1,18 @@
-#include "runtime.h"
+#include <emscripten.h>
+#include <stdlib.h>
 #include "image.h"
 
-#define WASM_EXPORT(name) __attribute__((export_name(name)))
-
-#define WASM_BUFFER_SIZE 800*500*4
-byte wasmBuffer[WASM_BUFFER_SIZE];
-
-void jsLog(const char* string, int length);
-
-void wasmLog(const char* string) {
-  jsLog(string, strlen(string));
+EMSCRIPTEN_KEEPALIVE
+byte* wasmAlloc(int width, int height) {
+  return malloc(width * height * 4);
 }
 
-WASM_EXPORT("getBufferOffset")
-byte* wasmGetBufferOffset() {
-  return &wasmBuffer[0];
+EMSCRIPTEN_KEEPALIVE
+void wasmFree(byte* p) {
+  free(p);
 }
 
-WASM_EXPORT("getBufferLength")
-unsigned long wasmGetBufferLength() {
-  return WASM_BUFFER_SIZE;
-}
-
-WASM_EXPORT("process")
-void wasmProcess(unsigned int width, unsigned int height) {
-  wasmLog("Hello World!");
-  process(width, height, wasmBuffer);    
+EMSCRIPTEN_KEEPALIVE
+void wasmProcess(unsigned int width, unsigned int height, byte* buffer) {
+  process(width, height, buffer);    
 }

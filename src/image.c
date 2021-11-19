@@ -1,6 +1,6 @@
 #include "image.h"
 
-void process(unsigned int width, unsigned int height, byte* bytes) {
+void process(unsigned int width, unsigned int height, byte* bytes) {  
   for (unsigned int y = 0; y < height; y++) {
     for (unsigned int x = 0; x < width; x++) { 
       unsigned long pixelOffset = (y * width * 4) + (x * 4);

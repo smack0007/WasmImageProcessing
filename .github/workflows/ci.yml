@@ -9,9 +9,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install LLVM and Clang
-        run: |
-          sh ./install-llvm.sh
+      - uses: mymindstorm/setup-emsdk@v9
+        with:
+          version: 2.0.34
+
+      - name: Verify emcc
+        run: emcc -v
 
       - name: Build
         run: |
@@ -19,7 +22,7 @@ jobs:
           pushd ./bin
           find -not -path "./.git/*" -not -name ".git" -delete
           popd
-          make -f build.mak build
+          make
 
       - name: Publish
         run: |
