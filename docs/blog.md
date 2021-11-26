@@ -7,18 +7,18 @@ grayscale via WASM. The code to convert images will be
 written in C but we'll also need to write some HTML and
 JavaScript to marry the C code with browser functionality.
 
-The sample repository can be found [here][repo]. Prerequistes
+The sample repository can be found [here][repo]. Prerequisites
 are [docker] and if you use [VS Code][vs-code] you can compile
 the sample by starting the build task or using `Ctrl + Shift + B`.
 
 You can also compile the sample by hand with [emscripten] and
-[make] but using [docker] simplifies this process.
+[make].
 
 ## The C Code
 
-The code to convert the image to grayscale takes as arguments
-the width and height of the image plus an array of bytes which
-represent the pixels of the image. Each pixel is 4 bytes per pixel
+The function to convert the image to grayscale takes the width and
+height of the image plus an array of bytes which represent the
+pixels of the image as arguments. Each pixel is 4 bytes long
 and is assumed to be in the [RGBA32][rgba] format:
 
 ```c
@@ -56,11 +56,9 @@ require more work as compiling with clang will not provide a C
 Standard Library, so functions like `malloc` and `printf` would
 have to implemented on your own.
 
-I won't cover the installation of [emscripten]
-in this article as the website provides detailed
-[installation instructions](https://emscripten.org/docs/getting_started/downloads.html#installation-instructions-using-the-emsdk-recommended)
-but we're using `emcc` via a docker container in this
-article:
+We're [emscripten] a docker container in this article but the documentation for emscripten provides detailed
+[installation instructions](https://emscripten.org/docs/getting_started/downloads.html#installation-instructions-using-the-emsdk-recommended).
+Here’s how to start the docker container:
 
 ```
 docker run --rm -it -v "$(pwd):/app" -w /app emscripten/emsdk /bin/bash
@@ -124,13 +122,14 @@ actually means.
 
 - `emcc` The [emscripten] compiler.
 - `-O3` Enables code optimization. This can be left out
-  until you know your code is working.
+  until you know your code is working in WASM for
+  debugging purposes.
 - `--no-entry` There is no `main` function in our C code
   as we're compiling a library.
 - `-s EXPORTED_RUNTIME_METHODS='["cwrap"]'` -s is for
   setting options in `emcc`. `EXPORTED_RUNTIME_METHODS` is
   used to define a list of built in [emscripten] functions
-  to expose in JavaScript.
+  to expose to JavaScript.
 - `-s NO_EXIT_RUNTIME=1` Normally [emscripten] would shut
   down our VM once `main` exits. This is a library and has
   no `main` so don't shut down the VM.
@@ -138,17 +137,16 @@ actually means.
   WASM VM to grow.
 - `-o "/app/bin/image.js"` Write the output to
   `/app/bin/image.js`. `/app` is the mapped path for the
-  repository in docker. We'll put all ouput in `/bin/` directory.
-  Although we're specifying `image.js` this will actually
-  produce 2 files: `image.js` and `image.wasm`. `image.js`
+  repository in docker. We'll put all output in the `/bin/`
+  directory. Although we're specifying `image.js` this will
+  actually produce 2 files: `image.js` and `image.wasm`. `image.js`
   is a bootstrapper for `image.wasm` and is the file we'll
-  include in our HTML file later.
+  include in our HTML file in the next step.
 
 ## HTML and JavaScript
 
 We're finally ready to load the WASM into the browser. You can
-see the complete [index.html] but we'll go through it step by
-step here. First let's create the HTML we need:
+see the complete [index.html here][index.html] but we'll go through it step by step. First let's create the HTML we need:
 
 ```html
 <!DOCTYPE html>
@@ -175,7 +173,7 @@ step here. First let's create the HTML we need:
 Initially we have a simple `Loading...` text that is visible
 and the canvas we'll use to display images is hidden. All JavaScript
 code that follows will be placed inside the last `script` tag.
-First let's fetch some DOM elements and setup a helper function:
+Now let's fetch some DOM elements and set up a helper function:
 
 ```js
 const loading = document.getElementById("loading");
@@ -210,8 +208,8 @@ const wasm = {
 ```
 
 [Module.cwrap][cwrap] is the function we exposed in the compile
-command via `EXPORTED_RUNTIME_METHODS`. It helps us create these
-bindings and takes 3 arguments:
+command via `EXPORTED_RUNTIME_METHODS`. It helps us create bindings
+from JavaScript to WASM and takes 3 arguments:
 
 1. The function name.
 2. The return type.
@@ -221,7 +219,7 @@ All types are the JavaScript types and pointers can be passed as
 `number`(s).
 
 Next we'll create a detached `Image` DOM element and use it to
-load images into the browser. Everytime an image is loaded we'll
+load images into the browser. Every time an image is loaded we'll
 convert it to grayscale via WASM:
 
 ```js
@@ -343,7 +341,7 @@ should see an error written to the console.
 [node]: https://nodejs.org/en/
 [http-server]: https://www.npmjs.com/package/http-server
 [image.c]: https://github.com/conciso/WasmImageProcessing/blob/main/src/image.c
-[index.html]: https://github.com/conciso/WasmImageProcessing/blob/main/src/image.c
+[index.html]: https://github.com/conciso/WasmImageProcessing/blob/main/src/index.html
 [wasm.c]: https://github.com/conciso/WasmImageProcessing/blob/main/src/wasm.c
 [makefile]: https://github.com/conciso/WasmImageProcessing/blob/main/Makefile
 [cwrap]: https://emscripten.org/docs/porting/connecting_cpp_and_javascript/Interacting-with-code.html#calling-compiled-c-functions-from-javascript-using-ccall-cwrap
