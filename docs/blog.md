@@ -1,13 +1,16 @@
 # Practical WebAssembly
 
+![WASM Image Processing Screenshot](WASMImageProcessing.png)
+
 WebAssembly (WASM) is an interesting technology that
 allows us to write code for the Web in a language other
-than JavaScript. In this article we'll convert images to
-grayscale via WASM. The code to convert images will be
+than JavaScript. In this article we'll apply a threshold
+filter to images via WASM. The code to convert images will be
 written in C but we'll also need to write some HTML and
 JavaScript to marry the C code with browser functionality.
 
-The sample repository can be found [here][repo]. Prerequisites
+The sample repository can be found [here][repo] and you can see
+the [finished sample][example] as well. Prerequisites
 are [docker] and if you use [VS Code][vs-code] you can compile
 the sample by starting the build task or using `Ctrl + Shift + B`.
 
@@ -16,13 +19,19 @@ You can also compile the sample by hand with [emscripten] and
 
 ## The C Code
 
-The function to convert the image to grayscale takes the width and
-height of the image plus an array of bytes which represent the
-pixels of the image as arguments. Each pixel is 4 bytes long
+The function to apply the threshold filter to the image takes the
+width and height of the image plus an array of bytes which represent
+the pixels of the image as arguments. Each pixel is 4 bytes long
 and is assumed to be in the [RGBA32][rgba] format:
 
 ```c
 #include "image.h"
+
+float32 threshold = 0.5f;
+
+float32 brightness(byte r, byte g, byte b) {
+  return (r / 255.0f) * 0.3f + (g / 255.0f) * 0.59f + (b / 255.0f) * 0.11f;
+}
 
 void process(uint32 width, uint32 height, byte* bytes) {
   for (uint32 y = 0; y < height; y++) {
@@ -33,11 +42,18 @@ void process(uint32 width, uint32 height, byte* bytes) {
       byte g = bytes[pixelOffset + 1];
       byte b = bytes[pixelOffset + 2];
 
-      byte gray = (byte)(((uint32)r + (uint32)g + (uint32)b) / 3);
+      float32 value = brightness(r, g, b);
 
-      bytes[pixelOffset] = gray;
-      bytes[pixelOffset + 1] = gray;
-      bytes[pixelOffset + 2] = gray;
+      if (value >= threshold) {
+        bytes[pixelOffset] = 255;
+        bytes[pixelOffset + 1] = 255;
+        bytes[pixelOffset + 2] = 255;
+      } else {
+        bytes[pixelOffset] = 0;
+        bytes[pixelOffset + 1] = 0;
+        bytes[pixelOffset + 2] = 0;
+        bytes[pixelOffset + 3] = 255;
+      }
     }
   }
 }
@@ -60,7 +76,7 @@ We're [emscripten] a docker container in this article but the documentation forÂ
 [installation instructions](https://emscripten.org/docs/getting_started/downloads.html#installation-instructions-using-the-emsdk-recommended).
 Hereâ€™s how to start the docker container:
 
-```
+```bash
 docker run --rm -it -v "$(pwd):/app" -w /app emscripten/emsdk /bin/bash
 ```
 
