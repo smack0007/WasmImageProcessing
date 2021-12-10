@@ -72,7 +72,8 @@ require more work as compiling with clang will not provide a C
 Standard Library, so functions like `malloc` and `printf` would
 have to implemented on your own.
 
-We're [emscripten] a docker container in this article but the documentation for emscripten provides detailed
+We're using [emscripten] via a docker container in this article but
+the documentation for [emscripten] provides detailed
 [installation instructions](https://emscripten.org/docs/getting_started/downloads.html#installation-instructions-using-the-emsdk-recommended).
 Here’s how to start the docker container:
 
@@ -236,7 +237,7 @@ All types are the JavaScript types and pointers can be passed as
 
 Next we'll create a detached `Image` DOM element and use it to
 load images into the browser. Every time an image is loaded we'll
-convert it to grayscale via WASM:
+apply the threshold filter via WASM:
 
 ```js
 const image = new Image();
@@ -301,14 +302,14 @@ npx http-server ./bin
 ```
 
 Load `http://localhost:8080/` in your browser and you should see
-your image presented in all it's grayscale glory.
+your image presented with the threshold filter applied.
 
 ## Drag and Drop
 
 This part really doesn't have anything to do with WASM anymore
 but I feel it makes the application a more complete example. We'll
 add drag and drop support so that images can be dropped onto the
-browser and they'll be presented in grayscale.
+browser and they'll have the filter applied as well.
 
 ```js
 // To enable drag and drop we need to call preventDefault
